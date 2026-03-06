@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bentgo Icon Library</title>
+  <title>Bentgo Asset Library</title>
   <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -11,6 +11,7 @@
 </head>
 <body>
 
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
   <div class="header">
     <div class="header-top">
       <div class="logo">
@@ -23,51 +24,139 @@
       </div>
       <span class="app-title">Asset Library</span>
       <span class="icon-count" id="icon-count">0</span>
+      <button class="btn-icon" onclick="openPanel('settings-panel')" title="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
     </div>
 
     <div class="search-row">
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          <circle cx="11" cy="11" r="7"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
         <input type="text" id="search-input" placeholder="Search assets…" oninput="filterAssets(this.value)" />
       </div>
     </div>
+
+    <!-- Category filter chips — populated by renderCategoryChips() -->
+    <div class="chips-row" id="category-chips"></div>
   </div>
 
+  <!-- ── Toolbar ─────────────────────────────────────────────────────────── -->
   <div class="toolbar">
-    <button class="btn-primary" onclick="refreshLibrary()">
+    <button class="btn-primary" onclick="document.getElementById('file-input').click()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="23 4 23 10 17 10"/>
-        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
       </svg>
-      Refresh
+      Add Asset
     </button>
-    <a class="btn-ghost" href="https://github.com/JonMikulanis/BDB-Icons/upload/main/assets" target="_blank" title="Upload assets to GitHub">
+    <button class="btn-ghost" id="refresh-btn" onclick="loadLibrary()" title="Refresh library from GitHub">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-        <polyline points="17 8 12 3 7 8"/>
-        <line x1="12" y1="3" x2="12" y2="15"/>
+        <polyline points="1 4 1 10 7 10"/>
+        <path d="M3.51 15a9 9 0 1 0 .49-4.95"/>
       </svg>
-    </a>
+    </button>
+    <input type="file" id="file-input" accept=".svg,.png,.jpg,.jpeg" style="display:none" onchange="handleUpload(this)" />
   </div>
 
-  <div id="status-bar" class="status-bar" style="display:none"></div>
   <div id="toast" class="toast"></div>
 
+  <!-- ── Content ────────────────────────────────────────────────────────── -->
   <div class="content">
     <div id="empty-state" class="empty-state">
-      <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2" style="width:52px;height:52px;opacity:0.3">
+      <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2">
         <rect x="8" y="8" width="20" height="20" rx="2"/>
         <rect x="36" y="8" width="20" height="20" rx="2"/>
         <rect x="8" y="36" width="20" height="20" rx="2"/>
         <rect x="36" y="36" width="20" height="20" rx="2"/>
+        <line x1="46" y1="46" x2="46" y2="52"/><line x1="43" y1="49" x2="49" y2="49"/>
       </svg>
-      <p class="empty-title">No assets found</p>
-      <p class="empty-sub">Click <strong>Refresh</strong> to reload, or upload assets to your GitHub repo.</p>
+      <p class="empty-title">No assets yet</p>
+      <p class="empty-sub">Hit <strong>Refresh</strong> to load from GitHub, or <strong>Add Asset</strong> to upload your first file.</p>
     </div>
+    <div id="icon-grid" class="icon-grid"></div>
+  </div>
 
-    <div id="asset-grid" class="icon-grid"></div>
+  <!-- ── Overlay (closes all panels on click) ───────────────────────────── -->
+  <div id="overlay" class="overlay" onclick="closeAllPanels()"></div>
+
+  <!-- ── Settings panel (slides up from bottom) ────────────────────────── -->
+  <div id="settings-panel" class="side-panel">
+    <div class="panel-header">
+      <span class="panel-title">Settings</span>
+      <button class="btn-icon" onclick="closePanel('settings-panel')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="panel-body">
+
+      <label class="field-label">
+        GitHub Personal Access Token
+        <span class="field-hint">repo scope · or Fine-grained with Contents: write</span>
+      </label>
+      <input type="password" id="set-token" class="field-input" placeholder="ghp_…" autocomplete="off" />
+
+      <label class="field-label mt">Repository Owner</label>
+      <input type="text" id="set-owner" class="field-input" placeholder="JonMikulanis" />
+
+      <label class="field-label mt">Repository Name</label>
+      <input type="text" id="set-repo" class="field-input" placeholder="BDB-Icons" />
+
+      <label class="field-label mt">Branch</label>
+      <input type="text" id="set-branch" class="field-input" placeholder="main" />
+
+      <button class="btn-primary full-width mt-lg" onclick="saveSettings()">Save Settings</button>
+    </div>
+  </div>
+
+  <!-- ── Upload modal (centered) ───────────────────────────────────────── -->
+  <div id="upload-modal" class="modal">
+    <div class="modal-header">
+      <span class="panel-title">Upload Asset</span>
+      <button class="btn-icon" onclick="closePanel('upload-modal')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <div class="file-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="file-icon">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+        <span id="up-filetype" class="file-type-badge">SVG</span>
+      </div>
+
+      <label class="field-label mt">Display Name</label>
+      <input type="text" id="up-display-name" class="field-input" placeholder="e.g. Arrow Right" />
+
+      <label class="field-label mt">Filename <span class="field-hint">saved under assets/</span></label>
+      <input type="text" id="up-filename" class="field-input" placeholder="e.g. arrow-right.svg" />
+
+      <label class="field-label mt">Category</label>
+      <input type="text" id="up-category" class="field-input" placeholder="e.g. Icons" list="up-cat-list" />
+      <datalist id="up-cat-list"></datalist>
+
+      <div class="modal-actions">
+        <button class="btn-ghost modal-btn" onclick="closePanel('upload-modal')">Cancel</button>
+        <button class="btn-primary modal-btn" onclick="confirmUpload()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;flex-shrink:0">
+            <polyline points="16 16 12 12 8 16"/>
+            <line x1="12" y1="12" x2="12" y2="21"/>
+            <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+          </svg>
+          Upload
+        </button>
+      </div>
+    </div>
   </div>
 
   <script src="app.js"></script>

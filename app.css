@@ -80,6 +80,27 @@ html, body {
   text-align: center;
 }
 
+/* ── Icon button (gear, close X) ── */
+.btn-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.btn-icon:hover {
+  color: var(--text);
+  background: var(--surface2);
+}
+.btn-icon svg { width: 15px; height: 15px; }
+
 /* ── Search ── */
 .search-row {
   margin-bottom: 10px;
@@ -121,6 +142,44 @@ html, body {
   color: var(--text-muted);
 }
 
+/* ── Category chips ── */
+.chips-row {
+  display: flex;
+  gap: 5px;
+  padding-bottom: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.chips-row::-webkit-scrollbar { display: none; }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.chip:hover {
+  color: var(--text);
+  border-color: rgba(124,106,247,0.5);
+  background: var(--surface2);
+}
+.chip.active {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
 /* ── Toolbar ── */
 .toolbar {
   display: flex;
@@ -147,10 +206,9 @@ html, body {
   transition: opacity 0.15s, transform 0.1s;
   justify-content: center;
 }
-
-.btn-primary:hover { opacity: 0.88; }
+.btn-primary:hover  { opacity: 0.88; }
 .btn-primary:active { transform: scale(0.97); }
-.btn-primary svg { width: 14px; height: 14px; }
+.btn-primary svg    { width: 14px; height: 14px; }
 
 .btn-ghost {
   display: flex;
@@ -165,14 +223,21 @@ html, body {
   transition: color 0.15s, border-color 0.15s, background 0.15s;
   flex-shrink: 0;
 }
-
 .btn-ghost:hover {
-  color: var(--danger);
-  border-color: var(--danger);
-  background: rgba(248,113,113,0.08);
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-dim);
 }
-
 .btn-ghost svg { width: 14px; height: 14px; }
+
+/* Refresh spinner */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.btn-ghost.spinning svg {
+  animation: spin 0.8s linear infinite;
+}
 
 /* ── Content area ── */
 .content {
@@ -182,8 +247,7 @@ html, body {
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
-
-.content::-webkit-scrollbar { width: 4px; }
+.content::-webkit-scrollbar       { width: 4px; }
 .content::-webkit-scrollbar-track { background: transparent; }
 .content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
@@ -198,25 +262,9 @@ html, body {
   gap: 12px;
   color: var(--text-muted);
 }
-
-.empty-state svg {
-  width: 52px;
-  height: 52px;
-  opacity: 0.35;
-}
-
-.empty-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-dim);
-}
-
-.empty-sub {
-  font-size: 12px;
-  line-height: 1.6;
-  max-width: 200px;
-}
-
+.empty-state svg { width: 52px; height: 52px; opacity: 0.35; }
+.empty-title { font-size: 14px; font-weight: 500; color: var(--text-dim); }
+.empty-sub   { font-size: 12px; line-height: 1.6; max-width: 200px; }
 .empty-sub strong { color: var(--text-dim); }
 
 /* ── Icon grid ── */
@@ -246,13 +294,7 @@ html, body {
   to   { opacity: 1; transform: scale(1); }
 }
 
-.icon-card:hover {
-  border-color: var(--accent);
-  background: var(--surface2);
-}
-
-.icon-card:hover .delete-btn { opacity: 1; }
-
+.icon-card:hover  { border-color: var(--accent); background: var(--surface2); }
 .icon-card:active { transform: scale(0.96); }
 
 .icon-preview {
@@ -264,25 +306,12 @@ html, body {
   pointer-events: none;
 }
 
-.icon-preview svg {
-  width: 100%;
-  height: 100%;
-  max-width: 36px;
-  max-height: 36px;
+/* Both SVG and raster previewed via <img> */
+.icon-preview img {
+  width: 36px;
+  height: 36px;
   object-fit: contain;
-  color: var(--text);
-  fill: currentColor;
-}
-
-/* Force SVGs without explicit fill/stroke to inherit */
-.icon-preview svg path,
-.icon-preview svg rect,
-.icon-preview svg circle,
-.icon-preview svg polygon,
-.icon-preview svg polyline,
-.icon-preview svg ellipse,
-.icon-preview svg line {
-  /* Don't override explicit fills */
+  display: block;
 }
 
 .icon-name {
@@ -296,27 +325,6 @@ html, body {
   white-space: nowrap;
   padding: 0 2px;
   font-family: 'DM Mono', monospace;
-}
-
-.delete-btn {
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--danger);
-  color: white;
-  border: none;
-  font-size: 11px;
-  line-height: 1;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.15s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
 }
 
 /* ── Toast notification ── */
@@ -338,12 +346,7 @@ html, body {
   z-index: 99;
   text-align: center;
 }
-
-.toast.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
+.toast.show    { opacity: 1; transform: translateY(0); }
 .toast.success { color: var(--success); border-color: rgba(52,211,153,0.3); }
 .toast.error   { color: var(--danger);  border-color: rgba(248,113,113,0.3); }
 .toast.info    { color: var(--accent);  border-color: rgba(124,106,247,0.3); }
@@ -357,59 +360,163 @@ html, body {
   font-size: 12px;
 }
 
-/* ── Status bar ── */
-.status-bar {
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-  padding: 6px 14px;
-  font-size: 11px;
-  color: var(--accent);
-  font-family: 'DM Mono', monospace;
-  flex-shrink: 0;
+/* ── Overlay ── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.overlay.show {
+  opacity: 1;
+  pointer-events: all;
 }
 
-/* ── Asset type badge ── */
-.asset-badge {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  padding: 1px 5px;
-  border-radius: 3px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
+/* ── Side panel (slides up from bottom) ── */
+.side-panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  z-index: 20;
+  transform: translateY(100%);
+  transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+  max-height: 88%;
+  overflow-y: auto;
+}
+.side-panel.open { transform: translateY(0); }
+
+/* ── Modal (centered overlay card) ── */
+.modal {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%) scale(0.95);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  z-index: 20;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s, transform 0.18s;
+}
+.modal.open {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(-50%) scale(1);
 }
 
-.asset-badge.svg {
-  background: rgba(124,106,247,0.15);
-  color: var(--accent);
-  border: 1px solid rgba(124,106,247,0.3);
-}
-
-.asset-badge.img {
-  background: rgba(52,211,153,0.12);
-  color: var(--success);
-  border: 1px solid rgba(52,211,153,0.25);
-}
-
-/* ── Upload button (anchor styled as btn-ghost) ── */
-a.btn-ghost {
-  text-decoration: none;
+/* ── Panel & modal internals ── */
+.panel-header,
+.modal-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 36px;
-  background: var(--surface);
+  justify-content: space-between;
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.panel-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.panel-body,
+.modal-body {
+  padding: 14px;
+}
+
+/* ── Form fields ── */
+.field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
   color: var(--text-dim);
+  margin-bottom: 5px;
+  letter-spacing: 0.2px;
+}
+.field-hint {
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+.field-input {
+  width: 100%;
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  cursor: pointer;
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  padding: 8px 10px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12.5px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.field-input:focus      { border-color: var(--accent); }
+.field-input::placeholder { color: var(--text-muted); }
+
+.mt    { margin-top: 12px; }
+.mt-lg { margin-top: 20px; }
+
+.full-width {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ── File type badge (upload modal) ── */
+.file-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.file-icon {
+  width: 22px;
+  height: 22px;
+  color: var(--text-dim);
   flex-shrink: 0;
 }
-
-a.btn-ghost:hover {
+.file-type-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
   color: var(--accent);
-  border-color: var(--accent);
   background: var(--accent-dim);
+  border: 1px solid rgba(124,106,247,0.3);
+  border-radius: 4px;
+  padding: 2px 6px;
 }
 
-a.btn-ghost svg { width: 14px; height: 14px; }
+/* ── Modal action row ── */
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+.modal-btn {
+  flex: 1;
+  justify-content: center;
+  height: 36px;
+}
+/* Ghost button used as a "Cancel" in the modal */
+.btn-ghost.modal-btn {
+  width: auto;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 0 12px;
+  color: var(--text-dim);
+}
+.btn-ghost.modal-btn:hover {
+  color: var(--text);
+  border-color: var(--border);
+  background: var(--surface2);
+}
