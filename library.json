@@ -1,1 +1,8 @@
-[]
+[
+  {
+    "name": "Bentgo Logo",
+    "file": "bentgo-logo.svg",
+    "type": "svg",
+    "category": "Logo"
+  }
+]
