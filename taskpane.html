@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Icon Library</title>
+  <title>Bentgo Icon Library</title>
   <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -21,54 +21,53 @@
           <rect x="14" y="14" width="7" height="7" rx="1"/>
         </svg>
       </div>
-      <span class="app-title">Icon Library</span>
+      <span class="app-title">Asset Library</span>
       <span class="icon-count" id="icon-count">0</span>
     </div>
 
     <div class="search-row">
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="7"/>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        <input type="text" id="search-input" placeholder="Search icons…" oninput="filterIcons(this.value)" />
+        <input type="text" id="search-input" placeholder="Search assets…" oninput="filterAssets(this.value)" />
       </div>
     </div>
   </div>
 
   <div class="toolbar">
-    <button class="btn-primary" onclick="document.getElementById('file-input').click()">
+    <button class="btn-primary" onclick="refreshLibrary()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        <polyline points="23 4 23 10 17 10"/>
+        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
       </svg>
-      Add Icons
+      Refresh
     </button>
-    <button class="btn-ghost" onclick="clearAll()" id="clear-btn" title="Remove all icons from this file">
+    <a class="btn-ghost" href="https://github.com/JonMikulanis/BDB-Icons/upload/main/assets" target="_blank" title="Upload assets to GitHub">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="3 6 5 6 21 6"/>
-        <path d="M19 6l-1 14H6L5 6"/>
-        <path d="M10 11v6M14 11v6"/>
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
       </svg>
-    </button>
-    <input type="file" id="file-input" accept=".svg" multiple style="display:none" onchange="handleUpload(this)" />
+    </a>
   </div>
 
+  <div id="status-bar" class="status-bar" style="display:none"></div>
   <div id="toast" class="toast"></div>
 
   <div class="content">
     <div id="empty-state" class="empty-state">
-      <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2">
+      <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2" style="width:52px;height:52px;opacity:0.3">
         <rect x="8" y="8" width="20" height="20" rx="2"/>
         <rect x="36" y="8" width="20" height="20" rx="2"/>
         <rect x="8" y="36" width="20" height="20" rx="2"/>
         <rect x="36" y="36" width="20" height="20" rx="2"/>
-        <line x1="46" y1="46" x2="46" y2="52"/><line x1="43" y1="49" x2="49" y2="49"/>
       </svg>
-      <p class="empty-title">No icons yet</p>
-      <p class="empty-sub">Click <strong>Add Icons</strong> to upload your SVG files. Icons are saved inside this PowerPoint file.</p>
+      <p class="empty-title">No assets found</p>
+      <p class="empty-sub">Click <strong>Refresh</strong> to reload, or upload assets to your GitHub repo.</p>
     </div>
 
-    <div id="icon-grid" class="icon-grid"></div>
+    <div id="asset-grid" class="icon-grid"></div>
   </div>
 
   <script src="app.js"></script>

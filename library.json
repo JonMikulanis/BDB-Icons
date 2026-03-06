@@ -1,0 +1,9 @@
+{
+  "assets": [
+    {
+      "name": "Example Icon",
+      "file": "example.svg",
+      "type": "svg"
+    }
+  ]
+}
