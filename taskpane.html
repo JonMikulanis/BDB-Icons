@@ -42,31 +42,118 @@
       </div>
     </div>
 
-    <!-- Category filter chips — populated by renderCategoryChips() -->
-    <div class="chips-row" id="category-chips"></div>
+    <div class="chips-row-wrap">
+      <div class="chips-row" id="category-chips"></div>
+      <!-- Inline add-category input -->
+      <div class="add-cat-wrap" id="add-cat-wrap">
+        <input
+          type="text"
+          id="add-cat-input"
+          class="add-cat-input"
+          placeholder="Folder name…"
+          maxlength="32"
+          onkeydown="handleAddCatKey(event)"
+          onblur="hideAddCategoryInput()"
+        />
+      </div>
+      <button class="btn-add-cat" onclick="showAddCategoryInput()" title="Add folder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+    </div>
   </div>
 
-  <!-- ── Toolbar ─────────────────────────────────────────────────────────── -->
+  <!-- ── Toolbar ──────────────────────────────────────────────────────────── -->
   <div class="toolbar">
     <button class="btn-primary" onclick="document.getElementById('file-input').click()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
       </svg>
-      Add Asset
+      Add Assets
     </button>
+    <!-- Sort -->
+    <button class="btn-ghost" id="sort-btn" onclick="toggleSort()" title="Sort: Default order">
+      <span id="sort-indicator" style="font-size:13px;font-weight:600;">↕</span>
+    </button>
+    <!-- Refresh -->
     <button class="btn-ghost" id="refresh-btn" onclick="loadLibrary()" title="Refresh library from GitHub">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <polyline points="1 4 1 10 7 10"/>
         <path d="M3.51 15a9 9 0 1 0 .49-4.95"/>
       </svg>
     </button>
-    <input type="file" id="file-input" accept=".svg,.png,.jpg,.jpeg" style="display:none" onchange="handleUpload(this)" />
+    <!-- Select mode -->
+    <button class="btn-ghost" id="select-btn" onclick="toggleSelectMode()" title="Select assets for bulk delete">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7" rx="1"/>
+        <rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/>
+        <polyline points="13 18 15 20 19 16"/>
+      </svg>
+    </button>
+    <input type="file" id="file-input" accept=".svg,.png,.jpg,.jpeg" multiple style="display:none" onchange="handleUpload(this)" />
+  </div>
+
+  <!-- ── Insert size strip ────────────────────────────────────────────────── -->
+  <div class="toolbar-size">
+    <span class="size-label">Insert:</span>
+    <div class="size-control">
+      <button class="size-btn active" data-size="0" onclick="setInsertSize(0)" title="Original size">Orig</button>
+      <button class="size-btn" data-size="1" onclick="setInsertSize(1)" title="Small (~1 inch)">S</button>
+      <button class="size-btn" data-size="2" onclick="setInsertSize(2)" title="Medium (~2 inches)">M</button>
+      <button class="size-btn" data-size="3" onclick="setInsertSize(3)" title="Large (~4 inches)">L</button>
+    </div>
   </div>
 
   <div id="toast" class="toast"></div>
 
-  <!-- ── Content ────────────────────────────────────────────────────────── -->
-  <div class="content">
+  <!-- ── Color strip ──────────────────────────────────────────────────────── -->
+  <div class="color-strip">
+    <div class="color-strip-top">
+      <span class="color-strip-label">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:11px;height:11px;vertical-align:middle;margin-right:3px;">
+          <circle cx="8" cy="8" r="6"/>
+          <path d="M8 2 C10 5 13 6 13 8 C13 11 10 13 8 13 C6 13 3 11 3 8 C3 6 6 5 8 2Z"/>
+        </svg>
+        SVG Fill
+      </span>
+      <span id="color-active-label" class="color-active-label" style="display:none"></span>
+    </div>
+    <div class="color-strip-row">
+      <div id="color-swatches" class="color-swatches"></div>
+      <div class="color-input-wrap" id="color-input-wrap">
+        <input
+          type="text"
+          id="color-hex-input"
+          class="color-hex-input"
+          placeholder="#HEX"
+          maxlength="7"
+          onkeydown="handleColorKey(event)"
+          onblur="hideColorInput()"
+        />
+      </div>
+      <button class="btn-add-color" onclick="showColorInput()" title="Add custom color">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Content / drop zone ──────────────────────────────────────────────── -->
+  <div class="content" id="drop-zone">
+
+    <div class="drag-overlay" id="drag-overlay">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <polyline points="16 16 12 12 8 16"/>
+        <line x1="12" y1="12" x2="12" y2="21"/>
+        <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+      </svg>
+      <p>Drop files here</p>
+      <span>SVG · PNG · JPG</span>
+    </div>
+
     <div id="empty-state" class="empty-state">
       <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2">
         <rect x="8" y="8" width="20" height="20" rx="2"/>
@@ -76,15 +163,71 @@
         <line x1="46" y1="46" x2="46" y2="52"/><line x1="43" y1="49" x2="49" y2="49"/>
       </svg>
       <p class="empty-title">No assets yet</p>
-      <p class="empty-sub">Hit <strong>Refresh</strong> to load from GitHub, or <strong>Add Asset</strong> to upload your first file.</p>
+      <p class="empty-sub">Click <strong>Add Assets</strong> or drop files anywhere in this panel.</p>
     </div>
+
     <div id="icon-grid" class="icon-grid"></div>
   </div>
 
-  <!-- ── Overlay (closes all panels on click) ───────────────────────────── -->
+  <!-- ── Select bar (floats above content when in select mode) ─────────────── -->
+  <div id="select-bar" class="select-bar">
+    <span id="select-count" class="select-count">0 selected</span>
+    <div class="select-bar-actions">
+      <button class="btn-select-cancel" onclick="cancelSelectMode()">Cancel</button>
+      <button class="btn-danger-sm" onclick="deleteSelectedConfirm()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+        </svg>
+        Delete
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Right-click context menu ─────────────────────────────────────────── -->
+  <div id="context-menu" class="context-menu">
+    <div class="ctx-item" onclick="ctxPreview()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+        <circle cx="12" cy="12" r="3"/>
+      </svg>
+      Preview
+    </div>
+    <div class="ctx-item" onclick="ctxFavorite()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+      <span id="ctx-fav-label">Add to Favorites</span>
+    </div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-item" onclick="ctxRename()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
+      Rename
+    </div>
+    <div class="ctx-item" onclick="ctxMove()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+        <polyline points="12 11 12 17"/><polyline points="9 14 12 17 15 14"/>
+      </svg>
+      Move to…
+    </div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-item ctx-danger" onclick="ctxDelete()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+      </svg>
+      Delete
+    </div>
+  </div>
+
+  <!-- ── Overlay ────────────────────────────────────────────────────────────── -->
   <div id="overlay" class="overlay" onclick="closeAllPanels()"></div>
 
-  <!-- ── Settings panel (slides up from bottom) ────────────────────────── -->
+  <!-- ── Settings panel ───────────────────────────────────────────────────── -->
   <div id="settings-panel" class="side-panel">
     <div class="panel-header">
       <span class="panel-title">Settings</span>
@@ -95,65 +238,179 @@
       </button>
     </div>
     <div class="panel-body">
-
       <label class="field-label">
         GitHub Personal Access Token
-        <span class="field-hint">repo scope · or Fine-grained with Contents: write</span>
+        <span class="field-hint">Fine-grained · Contents: read+write</span>
       </label>
       <input type="password" id="set-token" class="field-input" placeholder="ghp_…" autocomplete="off" />
-
       <label class="field-label mt">Repository Owner</label>
       <input type="text" id="set-owner" class="field-input" placeholder="JonMikulanis" />
-
       <label class="field-label mt">Repository Name</label>
       <input type="text" id="set-repo" class="field-input" placeholder="BDB-Icons" />
-
       <label class="field-label mt">Branch</label>
       <input type="text" id="set-branch" class="field-input" placeholder="main" />
-
       <button class="btn-primary full-width mt-lg" onclick="saveSettings()">Save Settings</button>
     </div>
   </div>
 
-  <!-- ── Upload modal (centered) ───────────────────────────────────────── -->
-  <div id="upload-modal" class="modal">
+  <!-- ── Batch upload modal ────────────────────────────────────────────────── -->
+  <div id="batch-modal" class="modal">
     <div class="modal-header">
-      <span class="panel-title">Upload Asset</span>
-      <button class="btn-icon" onclick="closePanel('upload-modal')">
+      <span class="panel-title" id="batch-header-count">Upload Files</span>
+      <button class="btn-icon" onclick="closePanel('batch-modal')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
       </button>
     </div>
     <div class="modal-body">
-
-      <div class="file-badge">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="file-icon">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-          <polyline points="14 2 14 8 20 8"/>
-        </svg>
-        <span id="up-filetype" class="file-type-badge">SVG</span>
+      <label class="field-label">Category <span class="field-hint">applies to all files</span></label>
+      <input type="text" id="batch-category" class="field-input" placeholder="e.g. Icons" list="batch-cat-list" />
+      <datalist id="batch-cat-list"></datalist>
+      <div class="batch-list-wrap">
+        <div id="batch-file-list" class="batch-file-list"></div>
       </div>
-
-      <label class="field-label mt">Display Name</label>
-      <input type="text" id="up-display-name" class="field-input" placeholder="e.g. Arrow Right" />
-
-      <label class="field-label mt">Filename <span class="field-hint">saved under assets/</span></label>
-      <input type="text" id="up-filename" class="field-input" placeholder="e.g. arrow-right.svg" />
-
-      <label class="field-label mt">Category</label>
-      <input type="text" id="up-category" class="field-input" placeholder="e.g. Icons" list="up-cat-list" />
-      <datalist id="up-cat-list"></datalist>
-
       <div class="modal-actions">
-        <button class="btn-ghost modal-btn" onclick="closePanel('upload-modal')">Cancel</button>
-        <button class="btn-primary modal-btn" onclick="confirmUpload()">
+        <button class="btn-ghost modal-btn" onclick="closePanel('batch-modal')">Cancel</button>
+        <button class="btn-primary modal-btn" onclick="confirmBatchUpload()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;flex-shrink:0">
             <polyline points="16 16 12 12 8 16"/>
             <line x1="12" y1="12" x2="12" y2="21"/>
             <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
           </svg>
-          Upload
+          <span id="batch-btn-label">Upload Files</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Preview modal ─────────────────────────────────────────────────────── -->
+  <div id="preview-modal" class="modal">
+    <div class="modal-header">
+      <span class="panel-title" id="preview-name">Preview</span>
+      <button class="btn-icon" onclick="closePanel('preview-modal')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body preview-body">
+      <div class="preview-image-wrap">
+        <img id="preview-img" src="" alt="" />
+      </div>
+      <div class="preview-meta">
+        <span id="preview-category" class="chip" style="pointer-events:none;cursor:default;font-size:11px;"></span>
+        <span id="preview-type" class="file-type-badge"></span>
+      </div>
+      <div class="preview-size-section">
+        <div class="field-label" style="margin-bottom:6px;">Insert size</div>
+        <div class="size-control">
+          <button class="size-btn active" data-size="0" onclick="setInsertSize(0)" title="Original size">Original</button>
+          <button class="size-btn" data-size="1" onclick="setInsertSize(1)" title="Small (~1 inch)">Small</button>
+          <button class="size-btn" data-size="2" onclick="setInsertSize(2)" title="Medium (~2 inches)">Medium</button>
+          <button class="size-btn" data-size="3" onclick="setInsertSize(3)" title="Large (~4 inches)">Large</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost modal-btn" onclick="closePanel('preview-modal')">Cancel</button>
+      <button class="btn-primary modal-btn" onclick="insertFromPreview()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+        Insert
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Rename modal ──────────────────────────────────────────────────────── -->
+  <div id="rename-modal" class="modal confirm-modal">
+    <div class="modal-header">
+      <span class="panel-title">Rename Asset</span>
+      <button class="btn-icon" onclick="closePanel('rename-modal')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <label class="field-label">Display name</label>
+      <input type="text" id="rename-input" class="field-input" placeholder="Asset name" onkeydown="handleRenameKey(event)" />
+      <div class="modal-actions">
+        <button class="btn-ghost modal-btn" onclick="closePanel('rename-modal')">Cancel</button>
+        <button class="btn-primary modal-btn" onclick="confirmRename()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Move modal ────────────────────────────────────────────────────────── -->
+  <div id="move-modal" class="modal confirm-modal">
+    <div class="modal-header">
+      <span class="panel-title">Move to Category</span>
+      <button class="btn-icon" onclick="closePanel('move-modal')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <label class="field-label">Category</label>
+      <input type="text" id="move-cat-input" class="field-input" placeholder="Category name" list="move-cat-list" onkeydown="handleMoveCatKey(event)" />
+      <datalist id="move-cat-list"></datalist>
+      <div class="modal-actions">
+        <button class="btn-ghost modal-btn" onclick="closePanel('move-modal')">Cancel</button>
+        <button class="btn-primary modal-btn" onclick="confirmMove()">Move</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Delete single asset modal ─────────────────────────────────────────── -->
+  <div id="delete-modal" class="modal confirm-modal">
+    <div class="modal-header">
+      <span class="panel-title">Delete Asset</span>
+      <button class="btn-icon" onclick="closePanel('delete-modal')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p class="confirm-text">Delete "<strong id="delete-asset-name"></strong>"?</p>
+      <p class="confirm-hint">This removes the file from GitHub permanently and cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn-ghost modal-btn" onclick="closePanel('delete-modal')">Cancel</button>
+        <button class="btn-danger modal-btn" onclick="confirmDeleteAsset()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+          </svg>
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Bulk delete confirmation modal ───────────────────────────────────── -->
+  <div id="delete-bulk-modal" class="modal confirm-modal">
+    <div class="modal-header">
+      <span class="panel-title">Delete Selected</span>
+      <button class="btn-icon" onclick="closePanel('delete-bulk-modal')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p class="confirm-text">Delete <strong id="delete-bulk-count">0</strong> selected asset(s)?</p>
+      <p class="confirm-hint">This removes the files from GitHub permanently and cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn-ghost modal-btn" onclick="closePanel('delete-bulk-modal')">Cancel</button>
+        <button class="btn-danger modal-btn" onclick="confirmDeleteBulk()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+          </svg>
+          Delete All
         </button>
       </div>
     </div>
